@@ -1,0 +1,170 @@
+{
+  pkgs,
+  lib,
+  ...
+}:
+{
+  sops.secrets = {
+    "pterodactyl-env" = { };
+    "pterodactyl-mysql-password" = { };
+    "pterodactyl-mysql-root-password" = { };
+  };
+
+  # Containers
+  virtualisation.oci-containers.containers."pterodactyl-cache" = {
+    image = "redis:alpine";
+    log-driver = "journald";
+    extraOptions = [
+      "--network-alias=cache"
+      "--network=pterodactyl_default"
+    ];
+  };
+
+  systemd.services."docker-pterodactyl-cache" = {
+    serviceConfig = {
+      Restart = lib.mkOverride 500 "always";
+      RestartMaxDelaySec = lib.mkOverride 500 "1m";
+      RestartSec = lib.mkOverride 500 "100ms";
+      RestartSteps = lib.mkOverride 500 9;
+    };
+    after = [
+      "docker-network-pterodactyl_default.service"
+    ];
+    requires = [
+      "docker-network-pterodactyl_default.service"
+    ];
+    partOf = [
+      "docker-compose-pterodactyl-root.target"
+    ];
+    wantedBy = [
+      "docker-compose-pterodactyl-root.target"
+    ];
+  };
+
+  virtualisation.oci-containers.containers."pterodactyl-database" = {
+    image = "library/mysql:8.0";
+    environment = {
+      MYSQL_DATABASE = "panel";
+      MYSQL_PASSWORD_FILE = "/run/secrets/mysql-password";
+      MYSQL_ROOT_PASSWORD_FILE = "/run/secrets/mysql-root-password";
+      MYSQL_USER = "pterodactyl";
+    };
+    volumes = [
+      "/var/lib/pterodactyl/mysql:/var/lib/mysql:rw"
+      "/run/secrets/pterodactyl-mysql-password:/run/secrets/mysql-password:ro"
+      "/run/secrets/pterodactyl-mysql-root-password:/run/secrets/mysql-root-password:ro"
+    ];
+    cmd = [ "--default-authentication-plugin=mysql_native_password" ];
+    log-driver = "journald";
+    extraOptions = [
+      "--network-alias=database"
+      "--network=pterodactyl_default"
+    ];
+  };
+
+  systemd.services."docker-pterodactyl-database" = {
+    serviceConfig = {
+      Restart = lib.mkOverride 500 "always";
+      RestartMaxDelaySec = lib.mkOverride 500 "1m";
+      RestartSec = lib.mkOverride 500 "100ms";
+      RestartSteps = lib.mkOverride 500 9;
+    };
+    after = [
+      "docker-network-pterodactyl_default.service"
+    ];
+    requires = [
+      "docker-network-pterodactyl_default.service"
+    ];
+    partOf = [
+      "docker-compose-pterodactyl-root.target"
+    ];
+    wantedBy = [
+      "docker-compose-pterodactyl-root.target"
+    ];
+  };
+
+  virtualisation.oci-containers.containers."pterodactyl-panel" = {
+    image = "ghcr.io/pelican-dev/panel:v1.0.0-beta21";
+    volumes =
+      let
+        caddyfile = pkgs.writeText "Caddyfile" ''
+          :80 {
+            root * /var/www/html/public
+            encode gzip
+
+            php_fastcgi 127.0.0.1:9000
+            file_server
+          }
+        '';
+      in
+      [
+        "/run/secrets/pterodactyl-env:/pelican-data/.env"
+        "${caddyfile}:/etc/caddy/Caddyfile:ro"
+      ];
+    labels = {
+      "traefik.docker.network" = "pterodactyl_default";
+      "traefik.enable" = "true";
+      "traefik.http.routers.pterodactyl.entrypoints" = "websecure";
+      "traefik.http.routers.pterodactyl.rule" = "Host(`panel.sapientes.ovh`)";
+      "traefik.http.routers.pterodactyl.service" = "pterodactyl";
+      "traefik.http.routers.pterodactyl.tls" = "true";
+      "traefik.http.routers.pterodactyl.tls.certresolver" = "letsencrypt";
+      "traefik.http.services.pterodactyl.loadbalancer.server.port" = "80";
+    };
+    dependsOn = [
+      "pterodactyl-cache"
+      "pterodactyl-database"
+    ];
+    log-driver = "journald";
+    extraOptions = [
+      "--network-alias=panel"
+      "--network=pterodactyl_default"
+    ];
+  };
+
+  systemd.services."docker-pterodactyl-panel" = {
+    serviceConfig = {
+      Restart = lib.mkOverride 500 "always";
+      RestartMaxDelaySec = lib.mkOverride 500 "1m";
+      RestartSec = lib.mkOverride 500 "100ms";
+      RestartSteps = lib.mkOverride 500 9;
+    };
+    after = [
+      "docker-network-pterodactyl_default.service"
+    ];
+    requires = [
+      "docker-network-pterodactyl_default.service"
+    ];
+    partOf = [
+      "docker-compose-pterodactyl-root.target"
+    ];
+    wantedBy = [
+      "docker-compose-pterodactyl-root.target"
+    ];
+  };
+
+  # Networks
+  systemd.services."docker-network-pterodactyl_default" = {
+    path = [ pkgs.docker ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStop = "${pkgs.docker}/bin/docker network rm -f pterodactyl_default";
+    };
+    script = ''
+      docker network inspect pterodactyl_default || docker network create pterodactyl_default
+    '';
+    partOf = [ "docker-compose-pterodactyl-root.target" ];
+    wantedBy = [ "docker-compose-pterodactyl-root.target" ];
+  };
+
+  # Root service
+  # When started, this will automatically create all resources and start
+  # the containers. When stopped, this will teardown all resources.
+  systemd.targets."docker-compose-pterodactyl-root" = {
+    unitConfig = {
+      Description = "Root target generated by compose2nix.";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
+}

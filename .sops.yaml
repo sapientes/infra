@@ -1,0 +1,32 @@
+keys:
+  - &admin_oskar age174qeep95knut3djpuayl4mgzqajuv8xnhv5tn0qff4x687vkz9lsxvy5wj
+
+  - &server_hestia age15h6pfzmhvn3vt9uarg3ekmgrk8mk9r32sc5t5zf6kpvvy2a46djqc3gc3j
+  - &server_poseidon age12wqxa2wcxjf3ntd3ptpy4jk7dwn6jfeql4pum36792whls3wh5aq3ezkjh 
+  - &server_demeter age1m30a7etw64y2pnnpatft2zr6jzkxdv6tue82c6wc5y7e5eh2w5gsrcrdxz
+  - &server_persephone age1sagta0cqq09k8tzr5df48n3rpctpljfvunxwu7nys858u30rt4gqlzduas 
+creation_rules:
+  - path_regex: poseidon/secrets\.(yaml|json|env|ini)$
+    key_groups:
+    - age:
+      - *admin_oskar
+      - *server_poseidon
+
+  - path_regex: hestia/secrets\.(yaml|json|env|ini)$
+    key_groups:
+    - age:
+      - *admin_oskar
+      - *server_hestia
+
+  - path_regex: persephone/secrets\.(yaml|json|env|ini)$
+    key_groups:
+    - age:
+      - *admin_oskar
+      - *server_persephone
+  
+  - path_regex: demeter/secrets\.(yaml|json|env|ini)$
+    key_groups:
+    - age:
+      - *admin_oskar
+      - *server_demeter
+
