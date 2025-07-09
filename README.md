@@ -1,6 +1,6 @@
 # sapientes-infra
 
-This repository contains the configuratio for all sapientes servers.  
+This repository contains the configuration for all sapientes servers.  
 It's built on top of deploy-rs and [oskardotglobal/bienenstock](https://github.com/oskardotglobal/bienenstock)
 
 ## Basic usage
