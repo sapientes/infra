@@ -2,7 +2,7 @@
   imports = [
     ../../lib/nixosModules/traefik.nix
     ../../lib/nixosModules/wings-docker.nix
-    ../../lib/nixosModules/substitutors.nix
+    ../../lib/nixosModules/substituters.nix
 
     ./hardware-configuration.nix
     ./pterodactyl.nix
