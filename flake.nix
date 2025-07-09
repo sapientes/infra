@@ -7,9 +7,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    deploy-rs.url = "github:serokell/deploy-rs";
+
     bienenstock = {
       url = "github:oskardotglobal/bienenstock";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.deploy-rs.follows = "deploy-rs";
     };
   };
 

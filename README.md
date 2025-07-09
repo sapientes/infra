@@ -1,5 +1,18 @@
 # sapientes-infra
 
+This repository contains the configuratio for all sapientes servers.  
+It's built on top of deploy-rs and [oskardotglobal/bienenstock](https://github.com/oskardotglobal/bienenstock)
+
+## Basic usage
+
+Commonly used commands can be found inside the Justfile.
+We use sops-nix for secret management, so your private key will have to be added by another admin
+before you can deploy.
+
+## CI
+
+We use garnix.io for CI. On push, the NixOS configurations and flake checks will be evaluated by them.
+
 ## Installation of NixOS on new machines
 
 Create a new VM using Oracle Linux **7.9**.  
