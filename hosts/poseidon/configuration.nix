@@ -9,7 +9,7 @@
   ];
 
   services.wings-docker = {
-    enable = true;
+    enable = false;
     enableTraefik = true;
     openFirewall = true;
     domain = "poseidon.sapientes.ovh";

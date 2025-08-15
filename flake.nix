@@ -7,6 +7,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix2container = {
+      url = "github:nlewo/nix2container";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     deploy-rs.url = "github:serokell/deploy-rs";
 
     bienenstock = {
@@ -45,6 +50,7 @@
         ];
 
         bienenstock = {
+          enablePackages = true;
           modules = [ sops-nix.nixosModules.sops ];
 
           hosts = {

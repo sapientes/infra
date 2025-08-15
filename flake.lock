@@ -11,11 +11,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1749723547,
-        "narHash": "sha256-KY/pAtQf9ZkFRcs8kpo7KeCaiICuhIsRLa/jrxnhp6c=",
+        "lastModified": 1752236506,
+        "narHash": "sha256-h/AVq2GqzBIRMelee3xnCJcCuXSvhyVA/rpZbZCFL70=",
         "owner": "oskardotglobal",
         "repo": "bienenstock",
-        "rev": "ff5e75576113d59d987b31a0dab575bd21584c6b",
+        "rev": "6a0fdc5597a04c0f2258329361c5f72f86483a1d",
         "type": "github"
       },
       "original": {
@@ -81,6 +81,26 @@
         "type": "github"
       }
     },
+    "nix2container": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1752002763,
+        "narHash": "sha256-JYAkdZvpdSx9GUoHPArctYMypSONob4DYKRkOubUWtY=",
+        "owner": "nlewo",
+        "repo": "nix2container",
+        "rev": "4f2437f6a1844b843b380d483087ae6d461240ee",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nlewo",
+        "repo": "nix2container",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1743014863,
@@ -117,6 +137,7 @@
       "inputs": {
         "bienenstock": "bienenstock",
         "deploy-rs": "deploy-rs",
+        "nix2container": "nix2container",
         "nixpkgs": "nixpkgs_2",
         "sops-nix": "sops-nix"
       }
