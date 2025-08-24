@@ -1,6 +1,7 @@
 {
   lib,
   config,
+  pkgs,
   ...
 }:
 with lib;
@@ -73,14 +74,18 @@ in
       allowedTCPPorts = [ 2022 ] ++ lib.optional (!cfg.enableTraefik) 443;
     };
 
-    systemd.services."docker-network-pelican_nw".script = mkForce ''
-      docker network inspect pelican_nw \
-        || docker network create pelican_nw \
-          --driver=bridge \
-          --opt=com.docker.network.bridge.name=pelican_nw \
-          --subnet=172.21.0.0/16
-      mkdir -p /etc/pelican
-      cat ${cfg.configFile} > /etc/pelican/config.yml
-    '';
+    systemd.services."docker-network-pelican_nw".script =
+      let
+        docker = getExe pkgs.docker;
+      in
+      mkForce ''
+        ${docker} network inspect pelican_nw \
+          || ${docker} network create pelican_nw \
+            --driver=bridge \
+            --opt=com.docker.network.bridge.name=pelican_nw \
+            --subnet=172.21.0.0/16
+        mkdir -p /etc/pelican
+        cat ${cfg.configFile} > /etc/pelican/config.yml
+      '';
   };
 }
