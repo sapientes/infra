@@ -80,6 +80,7 @@
 
           rootAuthorizedKeys = [
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBsjQyPmsIUExmD++xE5YOEm9JBvw0iIjMkypWo7oFTa oskar@ares"
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+Mi+ShQQvyCChhTtJixwSBWHtJe36w47diI3wkTrMi oskar@hermes"
           ];
         };
 

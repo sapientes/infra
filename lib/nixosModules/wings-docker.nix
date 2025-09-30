@@ -39,7 +39,6 @@ in
         "/var/lib/docker/containers:/var/lib/docker/containers:rw"
         "/var/lib/pelican:/var/lib/pelican:rw"
         "/etc/pelican:/etc/pelican:rw"
-        "/tmp/pelican:/tmp/pelican:rw"
         "/var/log/pelican:/var/log/pelican:rw"
       ];
 
