@@ -40,6 +40,7 @@ in
         "/var/lib/pelican:/var/lib/pelican:rw"
         "/etc/pelican:/etc/pelican:rw"
         "/var/log/pelican:/var/log/pelican:rw"
+        "/tmp/pelican:/tmp/pelican:rw"
       ];
 
       ports =
@@ -72,6 +73,10 @@ in
     networking.firewall = mkIf cfg.openFirewall {
       allowedTCPPorts = [ 2022 ] ++ lib.optional (!cfg.enableTraefik) 443;
     };
+
+    systemd.tmpfiles.rules = [
+      "d /tmp/pelican 0755 688 688 -"
+    ];
 
     systemd.services."docker-network-pelican_nw".script =
       let
