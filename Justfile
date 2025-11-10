@@ -4,7 +4,11 @@ default:
 
 # Deploy config using deploy-rs
 deploy host:
-  NIXPKGS_ALLOW_UNFREE=1 deploy '.#{{host}}' -- --impure
+  export NIXPKGS_ALLOW_UNFREE=1
+
+  deploy '.#{{host}}' \
+      -- --impure --log-format internal-json -v \
+    |& nom --json
 
 # Edit a file using sops
 sops file:

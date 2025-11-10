@@ -7,5 +7,6 @@ pkgs.mkShell {
     just
     sops
     deploy-rs
+    nix-output-monitor
   ];
 }
