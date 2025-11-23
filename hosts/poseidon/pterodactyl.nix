@@ -100,9 +100,15 @@
         cat /pelican-data/.env > .env
 
         chown -R www-data:www-data .
-        chmod a+x ./docker/entrypoint.sh
 
-        exec ./docker/entrypoint.sh runsvdir -P /etc/service
+        ## make sure the db is set up
+        echo -e "Migrating Database"
+        php artisan migrate --force
+
+        echo -e "Optimizing Filament"
+        php artisan filament:optimize
+
+        exec runsvdir -P /etc/service
         EOM
       '';
 
@@ -110,12 +116,12 @@
         name = imageName;
         tag = imageTag;
 
-        # v1.0.0-beta22
+        # v1.0.0-beta28
         fromImage = nix2container.pullImage {
           imageName = "ghcr.io/${imageName}";
-          imageDigest = "sha256:3982d746bff5f6623c476804d71b2445e4cd6c2205b3dbb205e4e5414d6fda21";
+          imageDigest = "sha256:9d58d20726ab4cecd713c21eef0cc26c69a1d2a9223e9d59921c37751b22b7ad";
           arch = "arm64";
-          sha256 = "sha256-ZuuSJPh2s8dPVR6EJ/bdbdwgMeLCB2Vtk3pxsWWpF1g=";
+          sha256 = "sha256-Rnv003aUMhrMZyV6xCIM2GhNmBHnKRvmSu79KC8i5Cg=";
         };
 
         config.entrypoint = [ "/entrypoint.sh" ];

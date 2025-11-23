@@ -7,12 +7,16 @@
     ./hardware-configuration.nix
   ];
 
-  services.wings-docker = {
-    enable = true;
-    enableTraefik = true;
-    openFirewall = true;
-    domain = "demeter.sapientes.ovh";
-    configFile = "/run/secrets/wings.yml";
+  services = {
+    wings-docker = {
+      enable = true;
+      enableTraefik = true;
+      openFirewall = true;
+      domain = "demeter.sapientes.ovh";
+      configFile = "/run/secrets/wings.yml";
+    };
+
+    netbird.enable = true;
   };
 
   sops = {
@@ -27,8 +31,14 @@
 
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 25565 7777 ];
-      allowedUDPPorts = [ 25565 7777 ];
+      allowedTCPPorts = [
+        25565
+        7777
+      ];
+      allowedUDPPorts = [
+        25565
+        7777
+      ];
     };
   };
 
