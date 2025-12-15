@@ -34,10 +34,12 @@
       allowedTCPPorts = [
         25565
         7777
+        2759
       ];
       allowedUDPPorts = [
         25565
         7777
+        2759
       ];
     };
   };
