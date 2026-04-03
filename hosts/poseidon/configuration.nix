@@ -12,7 +12,7 @@
     enable = true;
     enableTraefik = true;
     openFirewall = true;
-    domain = "poseidon.sapientes.ovh";
+    domain = "poseidon.ligma.ovh";
     configFile = "/run/secrets/wings.yml";
   };
 

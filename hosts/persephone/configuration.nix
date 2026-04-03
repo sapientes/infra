@@ -11,7 +11,7 @@
     enable = true;
     enableTraefik = true;
     openFirewall = true;
-    domain = "persephone.sapientes.ovh";
+    domain = "persephone.ligma.ovh";
     configFile = "/run/secrets/wings.yml";
   };
 
@@ -27,8 +27,14 @@
 
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 25565 7777 ];
-      allowedUDPPorts = [ 25565 7777 ];
+      allowedTCPPorts = [
+        25565
+        7777
+      ];
+      allowedUDPPorts = [
+        25565
+        7777
+      ];
     };
   };
 

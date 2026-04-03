@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
 
     sops-nix = {
       url = "github:Mic92/sops-nix";
@@ -42,7 +42,7 @@
       ...
     }:
     bienenstock.mkFlake { inherit inputs; } (
-      { lib, ... }:
+      { lib, config, ... }:
       {
         imports = [
           bienenstock.flakeModules.default
@@ -94,7 +94,30 @@
           { pkgs, ... }:
           {
             formatter = pkgs.nixfmt-tree;
-            # devShells.default = import ./shell.nix { inherit pkgs; };
+
+            packages.sshConfig = pkgs.writeText "ssh_config" config.bienenstock.sshConfig;
+            devShells.default =
+              let
+                sshWrapper = pkgs.writeShellScriptBin "ssh" ''
+                  exec ${pkgs.openssh}/bin/ssh -F "$SSH_CONFIG_FILE" "$@"
+                '';
+              in
+              pkgs.mkShell {
+                shellHook = ''
+                  export SSH_CONFIG_FILE=$(nix build --no-link --print-out-paths .#sshConfig)
+                '';
+
+                nativeBuildInputs = with pkgs; [
+                  nixfmt-rfc-style
+
+                  just
+                  sops
+                  deploy-rs
+                  nix-output-monitor
+
+                  sshWrapper
+                ];
+              };
 
             checks = lib.mkForce { };
           };

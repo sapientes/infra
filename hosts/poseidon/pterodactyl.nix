@@ -161,7 +161,7 @@
         "traefik.docker.network" = "pterodactyl_default";
         "traefik.enable" = "true";
         "traefik.http.routers.pterodactyl.entrypoints" = "websecure";
-        "traefik.http.routers.pterodactyl.rule" = "Host(`panel.sapientes.ovh`)";
+        "traefik.http.routers.pterodactyl.rule" = "Host(`panel.sapientes.ovh`) || Host(`panel.ligma.ovh`)";
         "traefik.http.routers.pterodactyl.service" = "pterodactyl";
         "traefik.http.routers.pterodactyl.tls" = "true";
         "traefik.http.routers.pterodactyl.tls.certresolver" = "letsencrypt";

@@ -12,7 +12,7 @@
       enable = true;
       enableTraefik = true;
       openFirewall = true;
-      domain = "demeter.sapientes.ovh";
+      domain = "demeter.ligma.ovh";
       configFile = "/run/secrets/wings.yml";
     };
 
