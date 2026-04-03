@@ -8,7 +8,7 @@
     };
 
     nix2container = {
-      url = "github:nlewo/nix2container";
+      url = "github:nlewo/nix2container/bb6801be998ba857a62c002cb77ece66b0a57298";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
