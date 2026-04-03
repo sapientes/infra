@@ -89,7 +89,7 @@
 
         cat > $out/etc/service/supercronic/run <<- 'EOM'
         #!/bin/sh
-        exec su-exec www-data supercronic -overlapping /etc/supercronic/crontab
+        exec su-exec www-data supercronic -overlapping /etc/crontabs/crontab
         EOM
 
         cat > $out/entrypoint.sh <<- EOM
@@ -116,12 +116,12 @@
         name = imageName;
         tag = imageTag;
 
-        # v1.0.0-beta28
+        # v1.0.0-beta33
         fromImage = nix2container.pullImage {
           imageName = "ghcr.io/${imageName}";
           imageDigest = "sha256:871032c289b7e00a23e1eb701772603750a14b8c7cfa72b072058ce645c41032";
           arch = "arm64";
-          sha256 = "sha256-";
+          sha256 = "sha256-g1gParkZdYRL9yISPVqZAYAKlzuccq//2T27Nsx36mE=";
         };
 
         config.entrypoint = [ "/entrypoint.sh" ];
