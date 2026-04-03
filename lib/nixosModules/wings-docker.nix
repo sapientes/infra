@@ -24,7 +24,7 @@ in
   config = mkIf cfg.enable {
     virtualisation.oci-containers.networks = [ "pelican_nw" ];
     virtualisation.oci-containers.containers.wings = {
-      image = "ghcr.io/pelican-dev/wings:v1.0.0-beta19";
+      image = "ghcr.io/pelican-dev/wings:v1.0.0-beta24";
 
       environment = {
         TZ = "UTC";

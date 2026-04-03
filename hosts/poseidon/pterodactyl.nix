@@ -119,9 +119,9 @@
         # v1.0.0-beta28
         fromImage = nix2container.pullImage {
           imageName = "ghcr.io/${imageName}";
-          imageDigest = "sha256:9d58d20726ab4cecd713c21eef0cc26c69a1d2a9223e9d59921c37751b22b7ad";
+          imageDigest = "sha256:871032c289b7e00a23e1eb701772603750a14b8c7cfa72b072058ce645c41032";
           arch = "arm64";
-          sha256 = "sha256-Rnv003aUMhrMZyV6xCIM2GhNmBHnKRvmSu79KC8i5Cg=";
+          sha256 = "sha256-";
         };
 
         config.entrypoint = [ "/entrypoint.sh" ];
