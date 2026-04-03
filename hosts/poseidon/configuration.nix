@@ -1,14 +1,15 @@
 {
   imports = [
     ../../lib/nixosModules/traefik.nix
-    ../../lib/nixosModules/wings-docker.nix
+    ../../lib/nixosModules/oci-containers.nix
+    ../../lib/nixosModules/wings.nix
+    ../../lib/nixosModules/pelican.nix
     ../../lib/nixosModules/substituters.nix
 
     ./hardware-configuration.nix
-    ./pterodactyl.nix
   ];
 
-  services.wings-docker = {
+  services.wings = {
     enable = true;
     enableTraefik = true;
     openFirewall = true;
@@ -16,11 +17,22 @@
     configFile = "/run/secrets/wings.yml";
   };
 
+  services.pelican = {
+    enable = true;
+    enableTraefik = true;
+    openFirewall = false;
+    domain = "panel.ligma.ovh";
+    configFile = "/run/secrets/pelican-env";
+  };
+
   sops = {
     defaultSopsFile = ./secrets.yaml;
     age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
 
-    secrets."wings.yml" = { };
+    secrets = {
+      "wings.yml" = { };
+      "pelican-env".owner = "pelican";
+    };
   };
 
   networking = {

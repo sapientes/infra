@@ -8,29 +8,7 @@ with lib;
 let
   cfg = config.services.wings;
 
-  wings = pkgs.buildGoModule {
-    pname = "wings";
-    version = "1.0.0-beta24";
-
-    src = pkgs.fetchFromGitHub {
-      owner = "pelican-dev";
-      repo = "wings";
-      rev = "v1.0.0-beta24";
-      sha256 = "sha256-MveNLXINvxAjJOG9nvXgfSxnEUkHI0Bnqxmgg/0Qu6Q=";
-    };
-
-    vendorHash = "sha256-juiJGX0wax1iIAODAgBUNLlfFg4kd14bB6IeEqohs8U=";
-
-    env.CGO_ENABLED = "0";
-
-    ldflags = [
-      "-s"
-      "-w"
-      "-X github.com/pelican-dev/wings/system.Version=1.0.0-beta24"
-    ];
-
-    meta.mainProgram = "wings";
-  };
+  wings = pkgs.callPackage ../../packages/pelican-wings.nix { };
 in
 {
   options.services.wings = {
@@ -55,6 +33,8 @@ in
       after = [ "docker.service" ];
       requires = [ "docker.service" ];
       wantedBy = [ "multi-user.target" ];
+
+      path = [ pkgs.shadow ];
 
       serviceConfig = {
         User = "root";

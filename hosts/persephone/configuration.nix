@@ -1,13 +1,13 @@
 {
   imports = [
     ../../lib/nixosModules/traefik.nix
-    ../../lib/nixosModules/wings-docker.nix
+    ../../lib/nixosModules/wings.nix
     ../../lib/nixosModules/substituters.nix
 
     ./hardware-configuration.nix
   ];
 
-  services.wings-docker = {
+  services.wings = {
     enable = true;
     enableTraefik = true;
     openFirewall = true;
