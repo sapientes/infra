@@ -50,7 +50,6 @@
         ];
 
         bienenstock = {
-          enablePackages = true;
           modules = [ sops-nix.nixosModules.sops ];
 
           hosts = {

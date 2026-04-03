@@ -49,7 +49,7 @@
 
   virtualisation.oci-containers.containers."pterodactyl-panel" =
     let
-      inherit (bienenstockLib.packages pkgs) nix2container;
+      nix2container = bienenstockLib.nix2container."${pkgs.system}";
 
       imageName = "pelican-dev/panel";
       imageTag = "v1.0.0-beta";
