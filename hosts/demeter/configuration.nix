@@ -10,10 +10,18 @@
   services = {
     wings = {
       enable = true;
+
       enableTraefik = true;
       openFirewall = true;
       domain = "demeter.ligma.ovh";
-      configFile = "/run/secrets/wings.yml";
+
+      secretConfigFile = "/run/secrets/wings.yml";
+      configuration = {
+        debug = false;
+        system.data = "/var/lib/pelican/volumes";
+        docker.network.dns = [ "169.254.169.254" ];
+        remote = "https://panel.ligma.ovh";
+      };
     };
 
     netbird.enable = true;

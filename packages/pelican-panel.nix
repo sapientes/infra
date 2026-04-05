@@ -79,5 +79,7 @@ stdenv.mkDerivation {
     cp -r ${frontendAssets} $out/public/build
   '';
 
+  patches = [ ./database-config.patch ];
+
   dontFixup = true;
 }

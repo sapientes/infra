@@ -20,12 +20,55 @@ let
 
   panel = pkgs.callPackage ../../packages/pelican-panel.nix { inherit php; };
 
+  autoConfig = {
+    APP_DEBUG = false;
+    APP_ENV = "production";
+    APP_INSTALLED = true;
+    APP_ENVIRONMENT_ONLY = false;
+    APP_URL = "https://${cfg.domain}";
+
+    DB_CONNECTION = "mysql_socket";
+    DB_DATABASE = "panel";
+    DB_USERNAME = "pelican";
+
+    REDIS_HOST = "localhost";
+    CACHE_DRIVER = "redis";
+    QUEUE_DRIVER = "redis";
+    SESSION_DRIVER = "redis";
+
+    MAIL_DRIVER = "log";
+  }
+  // optionalAttrs cfg.enableTraefik {
+    TRUSTED_PROXIES = "*";
+  };
+
+  mergedConfig = autoConfig // cfg.configuration;
+
+  storeEnv =
+    let
+      mkValueString =
+        v:
+        if builtins.isString v then
+          ''"${v}"''
+        else if v == false then
+          "false"
+        else if v == true then
+          "true"
+        else
+          builtins.toString v;
+      mkKeyValue = lib.generators.mkKeyValueDefault { inherit mkValueString; } "=";
+    in
+    lib.pipe mergedConfig [
+      (lib.generators.toKeyValue { inherit mkKeyValue; })
+      (pkgs.writeText "pelican-base.env")
+    ];
+
   setupScript = pkgs.writeShellScript "pelican-setup" ''
     set -euo pipefail
 
-    STATE=/var/lib/pelican
-    WWW=$STATE/www
-    STORE=${panel}
+    STATE="/var/lib/pelican"
+    WWW="$STATE/www"
+    STORE="${panel}"
 
     # Create persistent state directories
     mkdir -p \
@@ -41,17 +84,19 @@ let
       echo "$STORE" > "$WWW/.nix-store-path"
     fi
 
+    # Merge base config with secrets (secrets first — first occurrence wins in PHP dotenv)
+    cat ${cfg.secretEnvFile} ${storeEnv} > "$STATE/.env"
+    chmod 640 "$STATE/.env"
+
     # Writable overlay symlinks
-    rm -rf  "$WWW/storage"          && ln -sfn $STATE/storage         "$WWW/storage"
-    rm -rf  "$WWW/bootstrap/cache"  && ln -sfn $STATE/bootstrap-cache "$WWW/bootstrap/cache"
-    rm -rf  "$WWW/plugins"          && ln -sfn $STATE/plugins         "$WWW/plugins"
-    ln -sfn $STATE/storage/app/public "$WWW/public/storage"
-    ln -sfn ${cfg.configFile}          "$WWW/.env"
+    ln -sfn "$STATE/storage" "$WWW/storage"
+    ln -sfn "$STATE/bootstrap-cache" "$WWW/bootstrap/cache"
+    ln -sfn "$STATE/plugins" "$WWW/plugins"
+    ln -sfn "$STATE/storage/app/public" "$WWW/public/storage"
+    ln -sfn "$STATE/.env" "$WWW/.env"
 
-    # Make public assets readable by caddy
     chmod -R o+rX "$WWW/public"
-
-    chown -R pelican:pelican $STATE
+    chown -R pelican:pelican "$STATE"
 
     # Run migrations and cache optimizations as the pelican user
     cd "$WWW"
@@ -67,13 +112,28 @@ in
     openFirewall = mkEnableOption "firewall rules for Pelican";
 
     domain = mkOption { type = types.str; };
-    configFile = mkOption { type = types.path; };
 
-    apiPort = mkOption {
+    configuration = mkOption {
+      type = types.attrsOf (
+        types.oneOf [
+          types.str
+          types.int
+          types.bool
+        ]
+      );
+      default = { };
+      description = "Base Pelican Panel configuration written to the Nix store at eval time as a .env file. Merged with secretEnvFile at runtime, with secrets taking precedence.";
+    };
+
+    secretEnvFile = mkOption {
+      type = types.path;
+      description = "Path to a .env file containing secret configuration values. Merged before configuration at runtime so its values take precedence.";
+    };
+
+    port = mkOption {
       type = types.port;
       default = 8081;
     };
-
   };
 
   config = mkIf cfg.enable {
@@ -87,10 +147,15 @@ in
     };
 
     services = {
-
       mysql = {
         enable = true;
         package = pkgs.mysql80;
+        ensureDatabases = [ mergedConfig.DB_DATABASE ];
+        initialScript = pkgs.writeText "pelican-mysql-init" ''
+          CREATE USER IF NOT EXISTS '${mergedConfig.DB_USERNAME}'@'127.0.0.1' IDENTIFIED WITH mysql_native_password BY "";
+          GRANT ALL PRIVILEGES ON `${mergedConfig.DB_DATABASE}`.* TO '${mergedConfig.DB_USERNAME}'@'127.0.0.1';
+          FLUSH PRIVILEGES;
+        '';
       };
 
       redis.servers.pelican = {
@@ -127,14 +192,9 @@ in
       };
 
       caddy = {
-        enable = true;
+        enable = mkDefault true;
 
-        globalConfig = ''
-          auto_https off
-          admin off
-        '';
-
-        virtualHosts.":${toString cfg.apiPort}" = {
+        virtualHosts.":${toString cfg.port}" = {
           extraConfig = ''
             root * /var/lib/pelican/www/public
             encode gzip
@@ -155,7 +215,7 @@ in
 
           services.pelican.loadBalancer = {
             passHostHeader = true;
-            servers = [ { url = "http://127.0.0.1:${toString cfg.apiPort}"; } ];
+            servers = [ { url = "http://127.0.0.1:${toString cfg.port}"; } ];
           };
         };
       };
@@ -237,7 +297,7 @@ in
     };
 
     networking.firewall = mkIf cfg.openFirewall {
-      allowedTCPPorts = lib.optional (!cfg.enableTraefik) cfg.apiPort;
+      allowedTCPPorts = lib.optional (!cfg.enableTraefik) cfg.port;
     };
   };
 }

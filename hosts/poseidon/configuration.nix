@@ -9,20 +9,46 @@
     ./hardware-configuration.nix
   ];
 
-  services.wings = {
-    enable = true;
-    enableTraefik = true;
-    openFirewall = true;
-    domain = "poseidon.ligma.ovh";
-    configFile = "/run/secrets/wings.yml";
-  };
+  services = {
+    wings = {
+      enable = true;
 
-  services.pelican = {
-    enable = true;
-    enableTraefik = true;
-    openFirewall = false;
-    domain = "panel.ligma.ovh";
-    configFile = "/run/secrets/pelican-env";
+      enableTraefik = true;
+      openFirewall = true;
+      domain = "poseidon.ligma.ovh";
+
+      secretConfigFile = "/run/secrets/wings.yml";
+      configuration = {
+        debug = false;
+        system.data = "/var/lib/pelican/volumes";
+        docker.network.dns = [ "169.254.169.254" ];
+        remote = "https://panel.ligma.ovh";
+      };
+    };
+
+    pelican = {
+      enable = true;
+
+      enableTraefik = true;
+      domain = "panel.ligma.ovh";
+
+      secretEnvFile = "/run/secrets/pelican-env";
+      configuration = {
+        APP_NAME = "Ligma Inc. Game Server Panel";
+        OAUTH_GITHUB_ENABLED = true;
+        OAUTH_GITHUB_SHOULD_CREATE_MISSING_USERS = true;
+        OAUTH_GITHUB_SHOULD_LINK_MISSING_USERS = true;
+      };
+    };
+
+    caddy = {
+      enable = true;
+
+      globalConfig = ''
+        auto_https off
+        admin off
+      '';
+    };
   };
 
   sops = {

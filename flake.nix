@@ -76,6 +76,14 @@
               targetHost = "129.159.86.137";
               remoteBuild = true;
             };
+
+            dionysus = {
+              system = "aarch64-linux";
+              modules = [ ./hosts/dionysus/configuration.nix ];
+
+              targetHost = "89.168.102.248";
+              remoteBuild = true;
+            };
           };
 
           rootAuthorizedKeys = [
@@ -113,6 +121,7 @@
                   sops
                   deploy-rs
                   nix-output-monitor
+                  ssh-to-age
 
                   sshWrapper
                 ];

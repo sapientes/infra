@@ -12,7 +12,7 @@
 
     enableTraefik = true;
     openFirewall = true;
-    domain = "persephone.ligma.ovh";
+    domain = "dionysus.ligma.ovh";
 
     secretConfigFile = "/run/secrets/wings.yml";
     configuration = {
@@ -35,17 +35,11 @@
 
     firewall = {
       enable = true;
-      allowedTCPPorts = [
-        25565
-        7777
-      ];
-      allowedUDPPorts = [
-        25565
-        7777
-      ];
+      allowedTCPPorts = [ 25565 ];
+      allowedUDPPorts = [ 25565 ];
     };
   };
 
   boot.loader.grub.configurationLimit = 1;
-  system.stateVersion = "24.11";
+  system.stateVersion = "25.11";
 }
